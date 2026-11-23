@@ -1,6 +1,6 @@
 # Library Management System
 
-**Live demo:** https://LIVE_URL · **Report:** [docs/Deployment_Report.pdf](docs/Deployment_Report.pdf)
+**Live demo:** https://harsha-library-management.vercel.app · **Report:** [docs/Deployment_Report.pdf](docs/Deployment_Report.pdf)
 
 The web demo runs this exact `library` package in your browser (Pyodide / WebAssembly), loaded with
 18 months of simulated activity from a large college library: 1,917 titles, 7,081 copies, 1,465 members
