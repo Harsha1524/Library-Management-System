@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Riverside Central Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a working circulation desk — calm, exact, institutional.
+   IDEA: the library's own ledger and shelf: cloth-bound green, date-due stamps in red.
+   PICTURE: a shelf of the most-borrowed books, spine height = times borrowed; loans-per-month chart beside it.
+   COLOUR and TYPE: bottle-green cloth, white pages, stamp red for overdue; Literata titles, Inter for the desk.
+   LAYOUT: green masthead with tabs, figures row, shelf + chart, then the working tables. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0f1612);--panel:light-dark(#f3f6f3,#16201a);--ink:light-dark(#14211a,#e6eee8);--mute:light-dark(#5b6b61,#9aaba0);
+--line:light-dark(#dbe3dd,#26332b);--green:#17432f;--green2:light-dark(#2f6b4d,#5fa883);--stamp:light-dark(#c8102e,#ff5a6e);--onG:#f1f6f2;--lime:#d9ead2}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Literata,Georgia,serif;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,4.4vw,48px)}h2{font-size:clamp(22px,2.6vw,30px);margin-bottom:14px}h3{font-size:19px}
+.band{padding:clamp(22px,3.5vw,48px) max(5vw,16px)}.wrap{max-width:1240px;margin:0 auto}
+header{background:var(--green);color:var(--onG);padding-bottom:0}
+header .top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+header p{margin:6px 0 0;color:#bcd3c4;max-width:60ch}
+.today{display:flex;gap:8px;align-items:center;color:#bcd3c4;font-size:14px}
+.today input{background:#0f3022;color:var(--onG);border:1px solid #3c6a53;border-radius:8px;padding:8px 10px;font:inherit;min-height:44px}
+nav{display:flex;gap:4px;overflow-x:auto;margin-top:22px}
+nav a{flex:none;color:#cfe0d5;text-decoration:none;padding:12px 16px;border-radius:10px 10px 0 0;font-weight:500;min-height:44px}
+nav a[aria-current]{background:var(--bg);color:var(--ink)}nav a:focus-visible{outline:2px solid var(--lime)}
+.figs{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:28px}
+.fig1{background:var(--bg);padding:16px 18px;flex:1 1 150px}.fig1 b{display:block;font:700 clamp(24px,3vw,34px)/1.1 Literata,Georgia,serif;font-variant-numeric:tabular-nums}
+.fig1 span{color:var(--mute);font-size:14px}.fig1.warn b{color:var(--stamp)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px}
+@media(max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.card{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--bg)}
+.note{color:var(--mute);font-size:14px;margin:6px 0 0}
+.shelf{display:flex;align-items:flex-end;gap:5px;height:260px;padding:0 10px;border-bottom:12px solid light-dark(#7a5a3a,#5b4128);position:relative}
+.spine{flex:1;border-radius:3px 3px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center;cursor:pointer;box-shadow:inset -4px 0 0 rgba(0,0,0,.18),inset 3px 0 0 rgba(255,255,255,.14);transition:transform .2s}
+.spine:hover,.spine:focus-visible{transform:translateY(-8px);outline:none}
+.spine i{writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font:600 12px/1 Inter,sans-serif;padding:8px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:calc(100% - 26px)}
+.spine em{position:absolute;top:6px;left:0;right:0;text-align:center;color:#fff;font:600 11px Inter;font-style:normal}
+.shelfcap{margin-top:10px;min-height:24px;font-size:14px;color:var(--mute)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:220px;border-bottom:1px solid var(--line)}
+.bars div{flex:1;background:var(--green2);border-radius:3px 3px 0 0;position:relative}.bars div:last-child{background:light-dark(#9cc4ad,#3b6b52)}
+.bars div:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-size:12px;padding:3px 6px;border-radius:5px;white-space:nowrap;margin-bottom:4px;z-index:2}
+.axis{display:flex;gap:4px;font-size:12px;color:var(--mute)}.axis span{flex:1;text-align:center;white-space:nowrap;overflow:visible;width:0}
+.feed{list-style:none;margin:0;padding:0}.feed li{display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+.feed time{color:var(--mute);font-size:13px;white-space:nowrap}.tag{font-size:12px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--panel);color:var(--green2);white-space:nowrap}
+.tag.red{color:var(--stamp)}.tag.ref{color:var(--mute)}
+.mix div{display:grid;grid-template-columns:118px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.mix .m{height:14px;background:var(--panel);border-radius:7px;overflow:hidden}.mix .m i{display:block;height:100%;background:var(--green2)}
+.mix b{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center}
+input,select,button{font:inherit;font-size:16px}
+input,select{min-height:44px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+input:focus-visible,select:focus-visible,button:focus-visible,.row:focus-visible{outline:2px solid var(--green2);outline-offset:1px}
+.tools input[type=search]{flex:1 1 260px}
+button{min-height:44px;padding:9px 16px;border-radius:10px;border:1px solid var(--green);background:var(--green);color:var(--onG);font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--green2);border-color:var(--line)}button.sm{min-height:36px;padding:5px 12px;font-size:14px}
+button:disabled{opacity:.5;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:15px}th{text-align:left;font-size:13px;color:var(--mute);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td small{display:block;color:var(--mute);font-size:13px}.row{cursor:pointer}.row:hover{background:var(--panel)}
+.red{color:var(--stamp)}.nowrap{white-space:nowrap}a[data-mid]{color:var(--green2);font-weight:500}
+.pager{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:12px;font-size:14px;color:var(--mute)}
+.forms{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px;margin-bottom:28px}
+form label{display:block;font-size:14px;font-weight:500;margin:10px 0 4px}form input,form select{width:100%}
+.preview{font-size:14px;color:var(--mute);min-height:21px;margin-top:4px}.preview.bad{color:var(--stamp)}
+.inline{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.inline>*{flex:1 1 140px}
+details.add{margin-bottom:16px}details.add summary{cursor:pointer;font-weight:600;color:var(--green2);min-height:44px;display:flex;align-items:center}
+#drawer{position:fixed;inset:0 0 0 auto;width:min(560px,100%);background:var(--bg);border-left:1px solid var(--line);box-shadow:-20px 0 40px rgba(0,0,0,.15);transform:translateX(105%);transition:transform .25s;z-index:20;overflow-y:auto;padding:24px}
+#drawer.open{transform:none}#drawer .x{float:right}
+.stampbox{display:inline-block;border:2px solid var(--stamp);color:var(--stamp);border-radius:6px;padding:2px 8px;font-weight:700;transform:rotate(-3deg);font-size:14px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(140%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;max-width:min(92vw,560px);z-index:30;transition:transform .25s;font-size:15px}
+#toast.show{transform:translateX(-50%)}#toast.bad{background:var(--stamp);color:#fff}
+#boot{position:fixed;inset:0;background:var(--green);color:var(--onG);display:grid;place-items:center;z-index:40;text-align:center;padding:24px}
+#boot ol{list-style:none;padding:0;margin:18px 0 0;color:#9fc0ab;font-size:15px}#boot li.on{color:#fff}#boot li.done{color:#9fc0ab;text-decoration:line-through}
+.sync{font-size:13px;color:#bcd3c4}.view[hidden]{display:none}
+.scroll{overflow-x:auto}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:7.5em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7em;margin-inline-start:-7.5em;color:var(--mute);font-size:12px}.stack td:empty{display:none}.shelf{height:200px}.spine i{font-size:10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<div id="boot"><div><h2>Riverside Central Library</h2><p style="color:#bcd3c4;margin:0">Opening the circulation desk…</p>
+<ol id="steps"><li>Starting Python in your browser</li><li>Loading the library package</li><li>Reading the ledger</li><li>Syncing today's changes</li></ol><p id="bootErr" class="note" style="color:#ffb3bd"></p></div></div>
+
+<header class="band"><div class="wrap">
+ <div class="top"><div><h1>Riverside Central Library</h1><p>Circulation desk · runs the <code>library</code> Python package live in your browser</p></div>
+ <div><label class="today">Today is <input type="date" id="today"></label><div class="sync" id="sync">Connecting…</div></div></div>
+ <nav id="nav"><a href="#desk">Desk</a><a href="#catalogue">Catalogue</a><a href="#members">Members</a><a href="#circulation">Issue &amp; return</a><a href="#overdue">Overdue</a></nav>
+</div></header>
+
+<main>
+<section class="view band" id="v-desk"><div class="wrap">
+ <div class="figs" id="figs"></div>
+ <div class="grid2">
+  <div class="card"><h3>Most borrowed titles</h3><p class="note">Spine height is the number of times borrowed. Click a book for details.</p><div class="shelf" id="shelf" style="margin-top:14px"></div><div class="shelfcap" id="shelfcap"></div></div>
+  <div class="card"><h3>Loans issued per month</h3><p class="note" id="barsNote"></p><div class="bars" id="bars" style="margin-top:14px"></div><div class="axis" id="axis"></div></div>
+ </div>
+ <div class="grid2" style="margin-top:28px">
+  <div class="card"><h3>At the desk lately</h3><ul class="feed" id="feed" style="margin-top:8px"></ul></div>
+  <div class="card"><h3>Members by type</h3><div class="mix" id="mix"></div><h3 style="margin-top:22px">Collection by subject</h3><div class="mix" id="subj"></div></div>
+ </div>
+ <p class="note" style="margin-top:18px">Sample data: 18 months of simulated circulation, generated through the same Library rules. Source code on <a href="https://github.com/Harsha1524/Library-Management-System/tree/python-oop-web" style="color:var(--green2)">GitHub</a>.</p>
+</div></section>
+
+<section class="view band" id="v-catalogue" hidden><div class="wrap">
+ <h2>Catalogue</h2>
+ <details class="add"><summary>Add a book</summary><form id="fBook" class="card" style="max-width:640px">
+  <div class="inline"><div><label for="bIsbn">ISBN</label><input id="bIsbn" required></div><div><label for="bType">Type</label><select id="bType"><option value="">For lending</option><option value="ref">Reference only</option></select></div></div>
+  <label for="bTitle">Title</label><input id="bTitle" required><label for="bAuthor">Author</label><input id="bAuthor" required>
+  <div class="inline"><div><label for="bSubj">Subject</label><select id="bSubj"></select></div><div><label for="bCopies">Copies</label><input id="bCopies" type="number" min="1" value="1"></div></div>
+  <p><button>Add book</button></p></form></details>
+ <div class="tools"><input type="search" id="qBook" placeholder="Search title, author or ISBN" aria-label="Search books"><select id="fSubj" aria-label="Subject"></select><select id="fAvail" aria-label="Availability"><option value="">Any availability</option><option value="in">On the shelf</option><option value="out">All copies out</option><option value="ref">Reference only</option></select><select id="sBook" aria-label="Sort"><option value="title">Sort: title</option><option value="loans">Sort: most borrowed</option><option value="avail">Sort: most available</option></select></div>
+ <table class="stack"><thead><tr><th>Title</th><th>Subject</th><th>ISBN</th><th class="n">On shelf</th><th class="n">Loans</th></tr></thead><tbody id="tBooks"></tbody></table>
+ <div class="pager" id="pBooks"></div>
+</div></section>
+
+<section class="view band" id="v-members" hidden><div class="wrap">
+ <h2>Members</h2>
+ <details class="add"><summary>Register a member</summary><form id="fMem" class="card" style="max-width:640px">
+  <div class="inline"><div><label for="mKind">Membership</label><select id="mKind"><option value="student">Student · 3 books, 14 days</option><option value="faculty">Faculty · 10 books, 30 days</option><option value="guest">Guest · 1 book, 7 days</option></select></div><div><label for="mId">Member ID</label><input id="mId" required></div></div>
+  <label for="mName">Name</label><input id="mName" required><p><button>Register</button></p></form></details>
+ <div class="tools"><input type="search" id="qMem" placeholder="Search name or member ID" aria-label="Search members"><select id="fKind" aria-label="Membership"><option value="">All memberships</option><option>student</option><option>faculty</option><option>guest</option></select><select id="fFine" aria-label="Fines"><option value="">Any balance</option><option value="due">Fines due</option><option value="out">Has books out</option></select></div>
+ <table class="stack"><thead><tr><th>Member</th><th>Type</th><th class="n">Books out</th><th class="n">All-time loans</th><th class="n">Fines due</th></tr></thead><tbody id="tMem"></tbody></table>
+ <div class="pager" id="pMem"></div>
+</div></section>
+
+<section class="view band" id="v-circulation" hidden><div class="wrap">
+ <h2>Issue &amp; return</h2>
+ <div class="forms">
+  <form id="fIssue" class="card"><h3>Issue a book</h3>
+   <label for="iMid">Member ID</label><input id="iMid" list="dlMem" autocomplete="off" required><div class="preview" id="iMidP"></div>
+   <label for="iIsbn">ISBN</label><input id="iIsbn" list="dlBook" autocomplete="off" required><div class="preview" id="iIsbnP"></div>
+   <p><button>Issue</button></p></form>
+  <form id="fRet" class="card"><h3>Return a book</h3>
+   <label for="rMid">Member ID</label><input id="rMid" list="dlMem" autocomplete="off" required><div class="preview" id="rMidP"></div>
+   <label for="rIsbn">Book on loan</label><select id="rIsbn" required><option value="">Enter a member first</option></select>
+   <p><button>Return</button></p></form>
+ </div>
+ <h3>Books out right now</h3>
+ <div class="tools" style="margin-top:10px"><input type="search" id="qLoan" placeholder="Filter by title, member or ID" aria-label="Filter loans"></div>
+ <table class="stack"><thead><tr><th>Book</th><th>Member</th><th>Issued</th><th>Due</th><th class="n">Fine so far</th><th></th></tr></thead><tbody id="tLoans"></tbody></table>
+ <div class="pager" id="pLoans"></div>
+</div></section>
+
+<section class="view band" id="v-overdue" hidden><div class="wrap">
+ <h2 id="odTitle">Overdue report</h2><p class="note" id="odNote" style="margin:-6px 0 16px"></p>
+ <table class="stack"><thead><tr><th>Member</th><th>Book</th><th>Was due</th><th class="n">Days late</th><th class="n">Fine so far</th><th></th></tr></thead><tbody id="tOd"></tbody></table>
+ <div class="pager" id="pOd"></div>
+</div></section>
+</main>
+<aside id="drawer" aria-label="Details"></aside>
+<div id="toast" role="status"></div>
+<datalist id="dlMem"></datalist><datalist id="dlBook"></datalist>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+{
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr=n=>'₹'+Number(n).toLocaleString('en-IN'), num=n=>Number(n).toLocaleString('en-IN');
+const fmt=iso=>iso?new Date(iso+'T00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+const SPINES=['#17432f','#7b2d26','#1d3f6e','#5c4a1e','#3d2a55','#2c5a5a','#8a5a1c','#40534a','#6b2e4c','#24425c','#5a3d2b','#2f5d3a','#704214','#3a3f6b'];
+const PAGE=50, page={books:0,mem:0,loans:0,od:0};
+let B, S, META={books:{},members:{}}, BK=new Map(), MB=new Map(), applied=new Set(), dbOps=null, mode='local', canWrite=true;
+let today=new Date().toISOString().slice(0,10);
+const step=i=>document.querySelectorAll('#steps li').forEach((li,j)=>li.className=j<i?'done':j===i?'on':'');
+function toast(msg,bad){const t=$('#toast');t.textContent=msg;t.className=bad?'bad show':'show';clearTimeout(toast.h);toast.h=setTimeout(()=>t.className=t.className.replace('show',''),4200)}
+const subj=isbn=>META.books[isbn]?.s||'Uncategorised';
+
+async function boot(){
+ try{
+  step(0);
+  const diag=[];const say=s=>diag.push(s);
+  addEventListener('securitypolicyviolation',e=>say('blocked '+e.violatedDirective+' '+(e.blockedURI||'').slice(0,80)));
+  const py=await Promise.race([loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}),new Promise((_,r)=>setTimeout(()=>r(new Error('Python took too long to start. '+diag.join(' | '))),60000))]);
+  step(1);
+  py.FS.mkdirTree('/app/library');
+  const files=['__init__','book','member','transaction','service','exceptions','storage','cli','demo'];
+  const texts=await Promise.all([...files.map(f=>fetch('/library/'+f+'.py')),fetch('/web/bridge.py')].map(p=>p.then(r=>r.text())));
+  files.forEach((f,i)=>py.FS.writeFile('/app/library/'+f+'.py',texts[i]));
+  py.FS.writeFile('/app/bridge.py',texts[files.length]);
+  py.runPython("import sys; sys.path.insert(0,'/app')");
+  B=py.pyimport('bridge');
+  step(2);
+  const raw=await (await fetch('/web/data/library_data.json')).text();
+  META=JSON.parse(raw).meta||META;
+  B.init(raw);
+  step(3); refresh(); $('#boot').remove(); connect();
+ }catch(e){console.error(e);$('#bootErr').textContent='Could not start: '+(e.message||e)}
+}
+
+let localDone=false;
+function replayLocal(){if(localDone)return;localDone=true;try{for(const op of JSON.parse(localStorage.getItem('lms-local-ops')||'[]'))replay(op)}catch(e){}}
+function demoNote(){const s=$('#sync');s.innerHTML='Demo mode: your changes stay in this browser · <a href="#" id="resetDemo" style="color:#d9ead2">reset</a>';
+ $('#resetDemo').onclick=e=>{e.preventDefault();try{localStorage.removeItem('lms-local-ops')}catch(_){};try{location.reload()}catch(_){toast('Cleared. Reload the page to start fresh.')}}}
+function replay(op){if(applied.has(op.id))return;applied.add(op.id);B.apply(JSON.stringify(op))}
+function refresh(){
+ S=JSON.parse(B.snapshot(today));
+ BK=new Map(S.books.map(b=>[b[0],b]));MB=new Map(S.members.map(m=>[m[0],m]));
+ $('#dlMem').innerHTML=S.members.map(m=>`<option value="${esc(m[0])}">${esc(m[1])}</option>`).join('');
+ $('#dlBook').innerHTML=S.books.filter(b=>b[5]&&b[4]).map(b=>`<option value="${esc(b[0])}">${esc(b[1])}</option>`).join('');
+ render();
+}
+
+async function connect(){
+ const sync=$('#sync');
+ const db=window.claude?.use?await window.claude.use('db').catch(()=>null):null;
+ if(!db){mode='local';replayLocal();refresh();demoNote();return}
+ try{const u=await window.claude.use('user');const w=u&&await u.can?.('data.write');if(w===false){canWrite=false}}catch(e){}
+ mode='db';dbOps=db.collection('ops');
+ sync.textContent='Syncing…';
+ const timer=setTimeout(()=>{if(canWrite)sync.textContent='Shared ledger not reachable yet';else{replayLocal();refresh();demoNote()}},10000);
+ dbOps.orderBy('ts').onSnapshot(snap=>{
+  let n=0;
+  if(!snap.metadata.fromCache){clearTimeout(timer);if(canWrite)sync.textContent='Live · saved to the shared ledger';else if(!localDone){demoNote()}}
+  for(const ch of snap.docChanges()){if(ch.type!=='added')continue;const d=ch.doc.data();if(!d||applied.has(ch.doc.id))continue;applied.add(ch.doc.id);B.apply(JSON.stringify(d));n++}
+  if(!canWrite&&!localDone&&!snap.metadata.fromCache){replayLocal();n++}
+  if(n)refresh();
+ },e=>{clearTimeout(timer);sync.textContent='Live sync stopped — reload to reconnect'});
+}
+
+async function act(t,a){
+ const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+ const op={t,a,on:today,ts:Date.now()};
+ const r=JSON.parse(B.apply(JSON.stringify(op)));
+ toast(r.msg,!r.ok);
+ if(!r.ok)return false;
+ applied.add(id);refresh();
+ if(mode==='db'&&canWrite){
+  try{await dbOps.doc(id).set(op)}catch(e){canWrite=false;demoNote();saveLocal({...op,id});toast('You can\'t edit the shared records, so this change is kept in your browser (demo mode).')}
+ }else{saveLocal({...op,id})}
+ return true;
+}
+function saveLocal(op){try{const l=JSON.parse(localStorage.getItem('lms-local-ops')||'[]');l.push(op);localStorage.setItem('lms-local-ops',JSON.stringify(l))}catch(e){}}
+
+/* ---------- views ---------- */
+const VIEWS=['desk','catalogue','members','circulation','overdue'];
+const view=()=>VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'desk';
+function render(){
+ const v=view();
+ VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
+ document.querySelectorAll('#nav a').forEach(a=>a.toggleAttribute('aria-current',a.hash==='#'+v));
+ ({desk,catalogue,members,circulation,overdue})[v]();
+}
+function pager(el,key,total,cb){
+ const pages=Math.max(1,Math.ceil(total/PAGE));page[key]=Math.min(page[key],pages-1);
+ el.innerHTML=`<span>${num(total)} result${total===1?'':'s'} · page ${page[key]+1} of ${pages}</span><button class="ghost sm" data-d="-1" ${page[key]?'':'disabled'}>Previous</button><button class="ghost sm" data-d="1" ${page[key]<pages-1?'':'disabled'}>Next</button>`;
+ el.onclick=e=>{const d=+e.target.dataset.d;if(d){page[key]+=d;cb();el.parentElement.scrollIntoView({block:'start'})}};
+}
+
+function desk(){
+ const copies=S.books.reduce((s,b)=>s+b[3],0), out=S.active.length, od=S.active.filter(a=>a[5]>0).length, due=S.members.reduce((s,m)=>s+m[3],0);
+ $('#figs').innerHTML=[[num(S.books.length),'titles in the catalogue'],[num(copies),'copies held'],[num(out),'books out on loan'],[num(od),'overdue right now',1],[inr(due),'fines outstanding',1],[num(S.members.length),'registered members'],[num(S.txns),'loans since May 2025']]
+  .map(([b,s,w])=>`<div class="fig1${w?' warn':''}"><b>${b}</b><span>${s}</span></div>`).join('');
+ const top=[...S.books].sort((a,b)=>b[6]-a[6]).slice(0,14), max=top[0]?.[6]||1;
+ $('#shelf').innerHTML=top.map((b,i)=>`<div class="spine" tabindex="0" data-isbn="${b[0]}" style="height:${Math.max(28,b[6]/max*100)}%;background:${SPINES[i%SPINES.length]}" aria-label="${esc(b[1])}, borrowed ${b[6]} times"><em>${b[6]}</em><i>${esc(b[1])}</i></div>`).join('');
+ const cap=e=>{const s=e.target.closest('.spine');if(s){const b=BK.get(s.dataset.isbn);$('#shelfcap').innerHTML=`<b>${esc(b[1])}</b> — ${esc(b[2])} · borrowed ${b[6]} times · ${b[4]} of ${b[3]} on the shelf`}};
+ $('#shelf').onmouseover=cap;$('#shelf').onfocusin=cap;$('#shelf').onclick=e=>{const s=e.target.closest('.spine');if(s)openBook(s.dataset.isbn)};
+ $('#shelfcap').innerHTML=top[0]?`<b>${esc(top[0][1])}</b> is the most borrowed title (${top[0][6]} loans).`:'';
+ const mm=Math.max(...S.monthly.map(m=>m[1]),1), narrow=$('#bars').clientWidth/S.monthly.length<38;
+ $('#bars').innerHTML=S.monthly.map(([m,c])=>`<div style="height:${c/mm*100}%" data-t="${monthName(m,1)}: ${num(c)} loans"></div>`).join('');
+ $('#axis').innerHTML=S.monthly.map(([m],i)=>`<span>${narrow?(i%3?'':monthName(m)):monthName(m)}</span>`).join('');
+ const best=[...S.monthly].sort((a,b)=>b[1]-a[1])[0];
+ $('#barsNote').textContent=best?`Busiest month: ${monthName(best[0],1)} with ${num(best[1])} loans. Quietest in the summer and December breaks. Current month is partial.`:'';
+ $('#feed').innerHTML=S.events.map(([d,k,isbn,mid,fine])=>{const b=BK.get(isbn),m=MB.get(mid);return `<li><time>${fmt(d).slice(0,-5)}</time><div><span class="tag${fine?' red':''}">${k==='issue'?'Issued':fine?'Returned · '+inr(fine)+' fine':'Returned'}</span> ${esc(b?.[1])} <span class="note">· ${esc(m?.[1])}</span></div></li>`}).join('');
+ const kinds=['student','faculty','guest'].map(k=>[k,S.members.filter(m=>m[2]===k).length]);
+ $('#mix').innerHTML=kinds.map(([k,c])=>bar(k[0].toUpperCase()+k.slice(1),c,S.members.length)).join('');
+ const sc={};S.books.forEach(b=>{const s=subj(b[0]);sc[s]=(sc[s]||0)+b[3]});
+ $('#subj').innerHTML=Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([s,c],i,a)=>bar(s.replace(' Engineering',' Engg.').replace('Management & Economics','Mgmt & Econ').replace('Computer Science','Comp. Science'),c,a[0][1])).join('');
+}
+const bar=(l,c,t)=>`<div><span>${esc(l)}</span><span class="m"><i style="width:${c/t*100}%"></i></span><b>${num(c)}</b></div>`;
+const monthName=(m,y)=>new Date(m+'-01T00:00').toLocaleDateString('en-GB',y?{month:'short',year:'numeric'}:{month:'short'});
+
+function catalogue(){
+ const q=$('#qBook').value.trim().toLowerCase(), s=$('#fSubj').value, av=$('#fAvail').value, so=$('#sBook').value;
+ let rows=S.books.filter(b=>(!q||b[1].toLowerCase().includes(q)||b[2].toLowerCase().includes(q)||b[0]===q)&&(!s||subj(b[0])===s)&&(!av||(av==='ref'?!b[5]:av==='in'?b[5]&&b[4]>0:b[5]&&b[4]===0)));
+ rows.sort(so==='loans'?(a,b)=>b[6]-a[6]:so==='avail'?(a,b)=>b[4]-a[4]:(a,b)=>a[1].localeCompare(b[1]));
+ pager($('#pBooks'),'books',rows.length,catalogue);
+ $('#tBooks').innerHTML=rows.slice(page.books*PAGE,(page.books+1)*PAGE).map(b=>`<tr class="row" tabindex="0" data-isbn="${b[0]}"><td><b>${esc(b[1])}</b><small>${esc(b[2])}</small></td><td>${esc(subj(b[0]))}</td><td class="nowrap">${b[0]}</td><td class="n">${b[5]?`<span class="${b[4]?'':'red'}">${b[4]} / ${b[3]}</span>`:'<span class="tag ref">Reference</span>'}</td><td class="n">${num(b[6])}</td></tr>`).join('')||'<tr><td colspan="5">No books match.</td></tr>';
+}
+function members(){
+ const q=$('#qMem').value.trim().toLowerCase(), k=$('#fKind').value, f=$('#fFine').value;
+ const rows=S.members.filter(m=>(!q||m[1].toLowerCase().includes(q)||m[0].toLowerCase().includes(q))&&(!k||m[2]===k)&&(!f||(f==='due'?m[3]>0:m[4]>0))).sort((a,b)=>a[1].localeCompare(b[1]));
+ pager($('#pMem'),'mem',rows.length,members);
+ $('#tMem').innerHTML=rows.slice(page.mem*PAGE,(page.mem+1)*PAGE).map(m=>`<tr class="row" tabindex="0" data-mid="${esc(m[0])}"><td><b>${esc(m[1])}</b><small>${esc(m[0])}</small></td><td>${m[2]}</td><td class="n">${m[4]} / ${m[5]}</td><td class="n">${num(m[6])}</td><td class="n ${m[3]?'red':''}">${m[3]?inr(m[3]):'—'}</td></tr>`).join('')||'<tr><td colspan="5">No members match.</td></tr>';
+}
+function circulation(){
+ const q=$('#qLoan').value.trim().toLowerCase();
+ const rows=S.active.filter(a=>{if(!q)return true;const b=BK.get(a[1]),m=MB.get(a[2]);return b[1].toLowerCase().includes(q)||m[1].toLowerCase().includes(q)||a[2].toLowerCase().includes(q)||a[1]===q}).sort((x,y)=>x[4].localeCompare(y[4]));
+ pager($('#pLoans'),'loans',rows.length,circulation);
+ $('#tLoans').innerHTML=rows.slice(page.loans*PAGE,(page.loans+1)*PAGE).map(loanRow).join('')||'<tr><td colspan="6">Nothing on loan.</td></tr>';
+ previews();
+}
+const loanRow=a=>{const b=BK.get(a[1]),m=MB.get(a[2]);return `<tr><td><b>${esc(b[1])}</b><small>${a[1]}</small></td><td><a href="#members" data-mid="${esc(a[2])}">${esc(m[1])}</a><small>${esc(a[2])} · ${m[2]}</small></td><td class="nowrap">${fmt(a[3])}</td><td class="nowrap ${a[5]?'red':''}">${fmt(a[4])}${a[5]?`<small class="red">${a[5]} days late</small>`:''}</td><td class="n ${a[6]?'red':''}">${a[6]?inr(a[6]):'—'}</td><td><button class="ghost sm" data-ret="${a[1]}|${esc(a[2])}">Return</button></td></tr>`};
+function overdue(){
+ const rows=JSON.parse(B.overdue(today)), total=rows.reduce((s,r)=>s+r[5],0);
+ $('#odTitle').textContent=`${num(rows.length)} books overdue`;
+ $('#odNote').textContent=`As of ${fmt(today)}, these would bring in ${inr(total)} in fines if returned today. Fines follow each membership's rule: students ₹2/day, faculty ₹1/day after a 7-day grace period, guests ₹20 + ₹5/day capped at ₹500.`;
+ pager($('#pOd'),'od',rows.length,overdue);
+ $('#tOd').innerHTML=rows.slice(page.od*PAGE,(page.od+1)*PAGE).map(r=>{const b=BK.get(r[1]),m=MB.get(r[2]);return `<tr><td><a href="#overdue" data-mid="${esc(r[2])}">${esc(m[1])}</a><small>${esc(r[2])} · ${m[2]}</small></td><td>${esc(b[1])}</td><td class="nowrap">${fmt(r[3])}</td><td class="n red">${r[4]}</td><td class="n red">${inr(r[5])}</td><td><button class="ghost sm" data-ret="${r[1]}|${esc(r[2])}">Return</button></td></tr>`}).join('')||'<tr><td colspan="6">Nothing overdue.</td></tr>';
+}
+
+/* ---------- drawer ---------- */
+function openDrawer(html){const d=$('#drawer');d.innerHTML=`<button class="ghost sm x" data-close>Close</button>`+html;d.classList.add('open');d.scrollTop=0;d.querySelector('[data-close]').focus()}
+function closeDrawer(){$('#drawer').classList.remove('open')}
+function openMember(mid){
+ const h=JSON.parse(B.history(mid)), act=h.rows.filter(r=>!r[5]);
+ openDrawer(`<h2 style="margin-top:8px">${esc(h.name)}</h2><p class="note">${esc(h.id)} · ${h.kind} · up to ${h.max} books for ${h.loan_days} days${META.members[mid]?.d?' · '+esc(META.members[mid].d):''}</p>
+ <div class="figs" style="margin-top:16px"><div class="fig1"><b>${act.length} / ${h.max}</b><span>books out</span></div><div class="fig1"><b>${h.rows.length}</b><span>all-time loans</span></div><div class="fig1${h.fines?' warn':''}"><b>${inr(h.fines)}</b><span>fines due</span></div></div>
+ ${h.fines?`<form id="fPay" class="card" style="margin-bottom:20px"><h3>Pay fine</h3><p class="note">Partial payments are allowed. Borrowing is blocked until the balance is cleared.</p><div class="inline"><div><label for="payAmt">Amount (₹)</label><input id="payAmt" type="number" min="1" max="${h.fines}" value="${h.fines}"></div><div><button>Record payment</button></div></div></form>`:''}
+ <h3>History</h3><table style="margin-top:8px"><thead><tr><th>Book</th><th>Issued</th><th>Status</th></tr></thead><tbody>${h.rows.slice(0,120).map(r=>`<tr><td>${esc(r[2])}</td><td class="nowrap">${fmt(r[3])}</td><td>${r[5]?`Returned ${fmt(r[5])}${r[6]?` <span class="red">· ${inr(r[6])}</span>`:''}`:`<span class="${r[4]<today?'stampbox':'tag'}">Due ${fmt(r[4])}</span> <button class="ghost sm" data-ret="${r[1]}|${esc(h.id)}">Return</button>`}</td></tr>`).join('')||'<tr><td colspan="3">No loans yet.</td></tr>'}</tbody></table>`);
+ const f=$('#fPay');if(f)f.onsubmit=async e=>{e.preventDefault();if(await act('pay',{mid,amount:+$('#payAmt').value}))openMember(mid)};
+ $('#drawer').dataset.mid=mid;
+}
+function openBook(isbn){
+ const b=BK.get(isbn), out=S.active.filter(a=>a[1]===isbn);
+ openDrawer(`<h2 style="margin-top:8px">${esc(b[1])}</h2><p class="note">${esc(b[2])} · ${esc(subj(isbn))}${META.books[isbn]?.y?' · '+META.books[isbn].y:''} · ISBN ${isbn}</p>
+ <div class="figs" style="margin-top:16px"><div class="fig1"><b>${b[5]?b[4]+' / '+b[3]:'Ref.'}</b><span>${b[5]?'on the shelf':'reference only'}</span></div><div class="fig1"><b>${num(b[6])}</b><span>times borrowed</span></div></div>
+ ${b[5]&&b[4]?`<p><button class="ghost" data-issue="${isbn}">Issue this book…</button></p>`:''}
+ <h3>Currently borrowed by</h3><table style="margin-top:8px"><tbody>${out.map(a=>{const m=MB.get(a[2]);return `<tr><td><a href="#" data-mid="${esc(a[2])}">${esc(m[1])}</a><small>${esc(a[2])}</small></td><td class="nowrap ${a[5]?'red':''}">Due ${fmt(a[4])}</td></tr>`}).join('')||'<tr><td>No copies out.</td></tr>'}</tbody></table>`);
+}
+
+/* ---------- forms ---------- */
+function previews(){
+ const m=MB.get($('#iMid').value.trim()), b=BK.get($('#iIsbn').value.trim());
+ const p1=$('#iMidP'),p2=$('#iIsbnP');
+ p1.className='preview'+(m&&(m[3]||m[4]>=m[5])?' bad':'');p1.textContent=m?`${m[1]} · ${m[2]} · ${m[4]}/${m[5]} books out${m[3]?' · owes '+inr(m[3])+' (must pay first)':''}`:'';
+ p2.className='preview'+(b&&(!b[5]||!b[4])?' bad':'');p2.textContent=b?`${b[1]} · ${b[5]?b[4]+' of '+b[3]+' on the shelf':'reference only, cannot be borrowed'}`:'';
+ const rm=$('#rMid').value.trim(), r=MB.get(rm), sel=$('#rIsbn'), cur=sel.value;
+ $('#rMidP').textContent=r?`${r[1]} · ${r[4]} book(s) out`:'';
+ const loans=S.active.filter(a=>a[2]===rm);
+ sel.innerHTML=loans.length?loans.map(a=>`<option value="${a[1]}">${esc(BK.get(a[1])[1])} — due ${fmt(a[4])}</option>`).join(''):`<option value="">${r?'No books out':'Enter a member first'}</option>`;
+ if(loans.some(a=>a[1]===cur))sel.value=cur;
+}
+['iMid','iIsbn','rMid'].forEach(id=>$('#'+id).addEventListener('input',previews));
+$('#fIssue').onsubmit=async e=>{e.preventDefault();if(await act('issue',{mid:$('#iMid').value.trim(),isbn:$('#iIsbn').value.trim()})){$('#iIsbn').value='';previews()}};
+$('#fRet').onsubmit=async e=>{e.preventDefault();const isbn=$('#rIsbn').value;if(!isbn)return toast('Pick a book on loan.',true);await act('return',{mid:$('#rMid').value.trim(),isbn});previews()};
+$('#fBook').onsubmit=async e=>{e.preventDefault();const a={isbn:$('#bIsbn').value.trim(),title:$('#bTitle').value.trim(),author:$('#bAuthor').value.trim(),copies:+$('#bCopies').value||1,ref:$('#bType').value==='ref',subject:$('#bSubj').value};
+ if(await act('add_book',a)){META.books[a.isbn]={s:a.subject};e.target.reset();refresh()}};
+$('#fMem').onsubmit=async e=>{e.preventDefault();if(await act('add_member',{kind:$('#mKind').value,mid:$('#mId').value.trim(),name:$('#mName').value.trim()}))e.target.reset()};
+const SUBJ=['Computer Science','Mechanical Engineering','Electrical Engineering','Civil Engineering','Chemical Engineering','Mathematics','Physics','Management & Economics','Humanities','Literature','Reference'];
+$('#bSubj').innerHTML=SUBJ.map(s=>`<option>${s}</option>`).join('');
+$('#fSubj').innerHTML='<option value="">All subjects</option>'+SUBJ.map(s=>`<option>${s}</option>`).join('');
+[['qBook','books',catalogue],['fSubj','books',catalogue],['fAvail','books',catalogue],['sBook','books',catalogue],['qMem','mem',members],['fKind','mem',members],['fFine','mem',members],['qLoan','loans',circulation]]
+ .forEach(([id,k,fn])=>$('#'+id).addEventListener('input',()=>{page[k]=0;fn()}));
+
+document.addEventListener('click',async e=>{
+ const t=e.target;
+ if(t.closest('[data-close]'))return closeDrawer();
+ const ret=t.closest('[data-ret]');if(ret){const[isbn,mid]=ret.dataset.ret.split('|');if(await act('return',{isbn,mid})&&$('#drawer').classList.contains('open')&&$('#drawer').dataset.mid===mid)openMember(mid);return}
+ const iss=t.closest('[data-issue]');if(iss){closeDrawer();location.hash='circulation';$('#iIsbn').value=iss.dataset.issue;previews();$('#iMid').focus();return}
+ const mm=t.closest('[data-mid]');if(mm&&!t.closest('form')){e.preventDefault();return openMember(mm.dataset.mid)}
+ const bk=t.closest('tr[data-isbn]');if(bk)return openBook(bk.dataset.isbn);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();if(e.key==='Enter'&&e.target.matches('tr.row')){e.target.click()}});
+addEventListener('hashchange',()=>{closeDrawer();if(S)render()});
+$('#today').value=today;
+$('#today').addEventListener('change',e=>{if(e.target.value){today=e.target.value;refresh();toast('Pretending today is '+fmt(today)+'. New loans and returns use this date.')}});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(S&&view()==='desk')desk()},150)});
+boot();
+}
+</script>
+</body>
+</html>
